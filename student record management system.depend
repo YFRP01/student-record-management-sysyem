@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1745184881 source:c:\users\user\documents\c++ language\student record management system\main.cpp
+	<iostream>
+	<time.h>
+	<string>
+	<cstdlib>
+	<ctime>
+
