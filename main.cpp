@@ -1,4 +1,5 @@
 #include <iostream>
+#include<vector>
 #include<time.h>
 #include<string>
 #include<cstdlib>
@@ -19,7 +20,7 @@ private:
 
 public:
     void add(int index){
-        cout<<"\t("<<index+1<<")"<<endl;
+        cout<<"\tStudent ("<<index+1<<"):"<<endl;
         cout<<"\t\tThe student's name:\t";
         cin>>name;
         cout<<"\t\tThe student's sex (m/f):\t";
@@ -49,10 +50,10 @@ public:
 
     void display(int index){
         if(index<0){
-            cout<<"***No match found!***"<<endl;
+            cout<<"\n\t\t\t****** No match found! ******"<<endl;
         }
         else{
-            cout<<"\t("<<index+1<<")"<<endl;
+            cout<<"\tStudent ("<<index+1<<"):"<<endl;
             cout<<"\t\tThe student's name:\t"<<name<<endl;
             cout<<"\t\tThe student's sex:\t"<<sex<<endl;
             cout<<"\t\tThe student's matricule: "<<matricule<<endl;
@@ -76,7 +77,7 @@ public:
     }
     void edit(int index){
         bool isAccepted = false;
-        cout<<"\t("<<index+1<<")"<<endl;
+        cout<<"\tStudent ("<<index+1<<"):"<<endl;
         int selection;
             cout<<"\t***Do you want to edit the student's name?\t\t(1) Yes continue\t(2) No exit:\t\t";
             cin>>selection;
@@ -111,7 +112,7 @@ public:
 
             }
             int i=0;
-            cout<<"\t***Do you want to edit the course scores?\t\t(1) Yes continue\t(2) No exit:\t\t";
+            cout<<"\t***Do you want to edit the student's course scores?\t\t(1) Yes continue\t(2) No exit:\t\t";
             cin>>selection;
             switch(selection){
             case 1:
@@ -119,7 +120,7 @@ public:
                 cout<<"\t\tMake your choices:"<<endl;
                 while(i<7){
                     cout<<"\t\t\t";
-                    cout<<"Edit the"<<course[i]<<" score?\t\t(1) Yes continue\t(2) No exit:\t\t";
+                    cout<<"Edit the "<<course[i]<<" score?\t\t(1) Yes continue\t(2) No exit:\t\t";
                     cin>>selection;
                         switch(selection){
                         case 1:
@@ -155,22 +156,17 @@ public:
 };
 
 
-int search_student(int size, student* students, string search_key_entity){
+int search_student(vector<student>&studentsDB, string search_key_entity){
     int i=0,res = -10;
-    while(i<size){
-        if (students[i].get_search_key(search_key_entity)) res = i;
+    while(i<studentsDB.size()){
+        if (studentsDB[i].get_search_key(search_key_entity)) res = i;
         i++;
     }
     return res;
 }
-void delete_stud(int &size, student* students, string search_key,int studIndex){
-    if(studIndex >= 0){
-        int i=studIndex;
-        while(i<size){
-            students[i] = students[i+1];
-            i++;
-        }
-        size--;
+void delete_stud(vector<student>&studentsDB, string search_key,int studIndex){
+    if(studIndex >= 0 && studIndex<studentsDB.size()){
+        studentsDB.erase(studentsDB.begin()+studIndex);
         cout<<"Delete Operation successful!"<<endl;
     }
     else{
@@ -178,33 +174,35 @@ void delete_stud(int &size, student* students, string search_key,int studIndex){
     }
 }
 
-void updateFunc(int studentIndex, student* students){
-    if(studentIndex == -10) cout<<"\t\t\t****** No match found and no update is made! ******"<<endl;
-    else students[studentIndex].edit(studentIndex);
+void updateFunc(int studentIndex, vector<student>&studentsDB){
+    if(studentIndex == -10) cout<<"\n\t\t\t****** No match found and no update is made! ******"<<endl;
+    else studentsDB[studentIndex].edit(studentIndex);
 }
 
 
 int main()
 {
+    srand(time(0));
+
     int count = 0,size = 0,selection,i=0,j=0;
     string search_key;
 
-    srand(time(0));
-
     bool toOperate = true,state = true;
-    student* students = new student[100];
+    vector<student>studentsDB;
+    student hold;
+
     cout<<"***************************************************************"<<endl;
     cout<<"You are requested to insert at least a student with his record in the database."<<endl;
-        students[count].add(count);
-        size++;
+        hold.add(count);
+        studentsDB.push_back(hold);
         count++;
         while(state){
             cout<<"***Do you want to continue adding?\t\t(1) Yes continue\t(2) No exit:\t\t";
             cin>>selection;
                 switch(selection){
                     case 1:
-                        students[count].add(count);
-                        size++;
+                        hold.add(count);
+                        studentsDB.push_back(hold);
                         count++;
                         break;
                     case 2:
@@ -212,6 +210,7 @@ int main()
                         cout<<"Exit operation successful!"<<endl;
                         break;
                     default:
+
                         cout<<"************** Invalid input! **************"<<endl;
                         cout<<"*************Function reloaded**************"<<endl;
                 }
@@ -228,18 +227,18 @@ int main()
 
         switch(choice){
             case 1:
-                students[count].add(count);
+                hold.add(count);
+                studentsDB.push_back(hold);
                 count++;
-                size++;
                 state = true;
                 while(state){
                     cout<<"***Do you want to continue adding?\t\t(1) Yes continue\t(2) No exit:\t\t";
                     cin>>selection;
                         switch(selection){
                             case 1:
-                                students[count].add(count);
+                                hold.add(count);
+                                studentsDB.push_back(hold);
                                 count++;
-                                size++;
                                 break;
                             case 2:
                                 state = false;
@@ -253,54 +252,40 @@ int main()
                 break;
 
             case 2:
-                if(size == 0) cout<<"The database is empty!";
+                if(studentsDB.size() == 0) cout<<"The database is empty!";
                 else{
                     i=0;
-                    while(i<size){
-                        students[i].display(i);
+                    while(i<studentsDB.size()){
+                        studentsDB[i].display(i);
                         i++;
                     }
                 }
 
                 break;
             case 3:
-                if(size == 0) cout<<"The database is empty!"<<endl;
+                if(studentsDB.size() == 0) cout<<"The database is empty!"<<endl;
                 else{
-                    cout<<"Enter the student's name or matricule for a searching operation: \t";
+                    cout<<"Enter either the student's name, email or matricule for a searching operation: \t";
                     cin>>search_key;
-                    students[search_student(size,students,search_key)].display(search_student(size,students,search_key));
+                    studentsDB[search_student(studentsDB,search_key)].display(search_student(studentsDB,search_key));
                 }
                 break;
             case 4:
-                if(size == 0) cout<<"The database is empty!"<<endl;
+                if(studentsDB.size() == 0) cout<<"The database is empty!"<<endl;
                 else{
-                    cout<<"Enter the student's name or matricule for a searching operation: \t";
+                    cout<<"Enter either the student's name, email or matricule for a searching operation: \t";
                     cin>>search_key;
-                    updateFunc(search_student(size, students, search_key), students);
+                    updateFunc(search_student(studentsDB, search_key), studentsDB);
                 }
                 break;
             case 5:
-                if(size == 0) cout<<"The database is empty!"<<endl;
+                if(studentsDB.size() == 0) cout<<"The database is empty!"<<endl;
                 else{
-                    cout<<"Enter the student's name, matricule, contact, \t\t";
-                    cin>>selection;
-                    switch(selection){
-                        case 1:
-                            cout<<"Enter the student's name for the delete operation: \t";
-                            cin>>search_key;
-                            delete_stud(size,students,search_key,search_student(size,students,search_key));
-                            break;
-                        case 2:
-                            cout<<"Enter the student's matricule for the delete operation: \t";
-                            cin>>search_key;
-                            delete_stud(size,students,search_key,search_student(size,students,search_key));
-                            break;
-                        default:
-                            cout<<"\n************** Invalid input! **************"<<endl;
-                            cout<<"**************Function exited!**************"<<endl;
+                    cout<<"Enter either the student's name, email or matricule for a searching operation: \t";
+                    cin>>search_key;
+                    delete_stud(studentsDB,search_key,search_student(studentsDB,search_key));
                     }
-                }
-                break;
+                    break;
             case 6:
                 toOperate = false;
                 cout<<"Exit operation successful!"<<endl;
@@ -311,7 +296,5 @@ int main()
         }
 
     }
-    delete[] students;
     return 0;
-
 }
